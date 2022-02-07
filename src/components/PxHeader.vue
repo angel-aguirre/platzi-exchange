@@ -21,9 +21,9 @@
 </template>
 
 <script>
-import PxIcon from "@/components/PxIcon.vue";
+import PxIcon from '@/components/PxIcon.vue';
 export default {
-    name: "PxHeader",
+    name: 'PxHeader',
     components: {
         PxIcon,
     },
