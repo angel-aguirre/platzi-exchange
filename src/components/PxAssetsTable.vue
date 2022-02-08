@@ -21,6 +21,7 @@
             >
                 <td class="py-0 px-1">
                     <img
+                        class="max-w-6 max-h-6"
                         v-bind:src="`https://static.coincap.io/assets/icons/${asset.symbol.toLowerCase()}@2x.png`"
                         v-bind:alt="asset.name"
                     />
@@ -29,9 +30,17 @@
                     <span class="font-bold">#{{ asset.rank }}</span>
                 </td>
                 <td>{{ asset.name }}</td>
-                <td>{{ asset.priceUsd }}</td>
-                <td>{{ asset.marketCapUsd }}</td>
-                <td>{{ asset.changePercent24Hr }}</td>
+                <td>{{ asset.priceUsd | dollar }}</td>
+                <td>{{ asset.marketCapUsd | dollar }}</td>
+                <td
+                    v-bind:class="
+                        parseFloat(asset.changePercent24Hr) < 0
+                            ? 'text-red-600'
+                            : 'text-green-600'
+                    "
+                >
+                    {{ asset.changePercent24Hr | percent }}
+                </td>
                 <td class="hidden sm:block"></td>
             </tr>
         </tbody>
