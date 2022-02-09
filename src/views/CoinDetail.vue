@@ -1,6 +1,13 @@
 <template>
     <div class="flex-col">
-        <template v-if="asset.id">
+        <div class="flex justify-center">
+            <bounce-loader
+                v-bind:loading="isLoading"
+                v-bind:color="'#68d391'"
+                v-bind:size:="100"
+            />
+        </div>
+        <template v-if="!isLoading">
             <div class="flex flex-col sm:flex-row justify-around items-center">
                 <div class="flex flex-col items-center">
                     <img
@@ -77,19 +84,69 @@
                     <span class="text-xl"></span>
                 </div>
             </div>
+
+            <line-chart
+                class="my-10"
+                v-bind:colors="['orange']"
+                v-bind:min="min"
+                v-bind:max="max"
+                v-bind:data="
+                    history.map((h) => [
+                        h.date,
+                        parseFloat(h.priceUsd).toFixed(2),
+                    ])
+                "
+            />
+
+            <h3 class="text-xl my-10">Mejores Ofertas de Cambio</h3>
+            <table>
+                <tr
+                    v-for="market in markets"
+                    v-bind:key="`${market.exchangeId}-${market.priceUsd}`"
+                    class="border-b"
+                >
+                    <td>
+                        <b>{{ market.exchangeId }}</b>
+                    </td>
+                    <td>{{ market.priceUsd | dollar }}</td>
+                    <td>{{ market.baseSymbol }} / {{ market.quoteSymbol }}</td>
+                    <td>
+                        <px-button
+                            v-bind:is-loading="market.isLoading"
+                            v-if="!market.url"
+                            v-on:click="getWebsite(market)"
+                        >
+                            <slot>Obtener Link</slot>
+                        </px-button>
+                        <a
+                            v-else
+                            class="hover:underline text-green-600"
+                            target="_blanck"
+                        >
+                            {{ market.url }}
+                        </a>
+                    </td>
+                </tr>
+            </table>
         </template>
     </div>
 </template>
 
 <script>
 import api from '@/api.js';
+import PxButton from '@/components/PxButton.vue';
 
 export default {
     name: 'CoinDetail',
+    components: {
+        PxButton,
+    },
     data: function () {
         return {
+            isLoading: false,
             asset: {},
             history: [],
+            markets: [],
         };
     },
     created: function () {
@@ -98,12 +155,31 @@ export default {
     methods: {
         getCoin: function () {
             const id = this.$route.params.id;
-            Promise.all([api.getAsset(id), api.getAssetHistory(id)]).then(
-                ([asset, history]) => {
+            this.isLoading = true;
+
+            Promise.all([
+                api.getAsset(id),
+                api.getAssetHistory(id),
+                api.getMarkets(id),
+            ])
+                .then(([asset, history, markets]) => {
                     this.asset = asset;
                     this.history = history;
-                }
-            );
+                    this.markets = markets;
+                })
+                .finally(() => (this.isLoading = false));
+        },
+        getWebsite: function (exchange) {
+            this.$set(exchange, 'isLoading', true);
+
+            return api
+                .getExchange(exchange.exchangeId)
+                .then((res) => {
+                    this.$set(exchange, 'url', res.exchangeUrl);
+                })
+                .finally(() => {
+                    this.$set(exchange, 'isLoading', false);
+                });
         },
     },
     computed: {
