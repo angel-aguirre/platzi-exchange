@@ -31,11 +31,11 @@ function getAssetHistory(coin) {
     const start = now.getTime();
     return fetch(
         `${url}/assets/${coin}/history?interval=h1&start=${start}&end=${end}`, {
-            mode: 'cors',
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-            },
+        mode: 'cors',
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+        },
     })
         .then((res) => res.json())
         .then((res) => res.data);
