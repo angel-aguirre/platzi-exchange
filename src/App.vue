@@ -1,6 +1,6 @@
 <template>
     <main>
-        <PxHeader></PxHeader>
+        <PxHeader v-bind:links="links"></PxHeader>
 
         <router-view
             class="container px-5 sm:px-20 py-20 flex justify-center"
@@ -15,6 +15,24 @@ export default {
     name: 'App',
     components: {
         PxHeader,
+    },
+    data: function () {
+        return {
+            links: [
+                {
+                    title: 'BTC',
+                    to: { name: 'coin-detail', params: { id: 'bitcoin' } },
+                },
+                {
+                    title: 'ETH',
+                    to: { name: 'coin-detail', params: { id: 'ethereum' } },
+                },
+                {
+                    title: 'XRP',
+                    to: { name: 'coin-detail', params: { id: 'xrp' } },
+                },
+            ],
+        };
     },
 };
 </script>
