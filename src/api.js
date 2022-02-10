@@ -30,20 +30,37 @@ function getAssetHistory(coin) {
     now.setDate(now.getDate() - 1);
     const start = now.getTime();
     return fetch(
-        `${url}/assets/${coin}/history?interval=h1&start=${start}&end=${end}`
-    )
+        `${url}/assets/${coin}/history?interval=h1&start=${start}&end=${end}`, {
+            mode: 'cors',
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+            },
+    })
         .then((res) => res.json())
         .then((res) => res.data);
 }
 
 function getMarkets(coin) {
-    return fetch(`${url}/assets/${coin}/markets?limit=5`)
+    return fetch(`${url}/assets/${coin}/markets?limit=5`, {
+        mode: 'cors',
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+        },
+    })
         .then((res) => res.json())
         .then((res) => res.data);
 }
 
 function getExchange(id) {
-    return fetch(`${url}/exchanges/${id}`)
+    return fetch(`${url}/exchanges/${id}`, {
+        mode: 'cors',
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+        },
+    })
         .then((res) => res.json())
         .then((res) => res.data);
 }
