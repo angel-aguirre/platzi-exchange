@@ -3,19 +3,36 @@
         <thead>
             <tr class="bg-gray-100 border-b-2 border-gray-400">
                 <th></th>
-                <th>
-                    <span>Ranking</span>
+                <th
+                    v-bind:class="{
+                        up: this.sortOrder == 1,
+                        down: this.sortOrder == -1,
+                    }"
+                >
+                    <span
+                        class="underline cursor-pointer"
+                        v-on:click="changeSortOrder"
+                        >Ranking</span
+                    >
                 </th>
                 <th>Nombre</th>
                 <th>Precio</th>
                 <th>Cap. de Mercado</th>
                 <th>Variación 24hs</th>
-                <td class="hidden sm:block"></td>
+                <td class="hidden sm:block">
+                    <input
+                        class="bg-gray-100 focus:outline-none border-b border-gray-400 py-2 px-4 block w-full appearance-none leading-normal"
+                        id="filter"
+                        placeholder="Buscar..."
+                        type="text"
+                        v-model="filter"
+                    />
+                </td>
             </tr>
         </thead>
         <tbody>
             <tr
-                v-for="asset in assets"
+                v-for="asset in filteredAssets"
                 v-bind:key="asset.id"
                 class="border-b border-gray-200 hover:bg-gray-100 hover:bg-orange-100"
             >
@@ -72,10 +89,38 @@ export default {
     components: {
         PxButton,
     },
+    data: function () {
+        return {
+            filter: '',
+            sortOrder: 1,
+        };
+    },
     props: {
         assets: {
             type: Array,
             default: () => [],
+        },
+    },
+    computed: {
+        filteredAssets: function () {
+            return this.assets
+                .filter((asset) => {
+                    return (
+                        asset.symbol
+                            .toLowerCase()
+                            .includes(this.filter.toLowerCase()) ||
+                        asset.name
+                            .toLowerCase()
+                            .includes(this.filter.toLowerCase())
+                    );
+                })
+                .sort((a, b) => {
+                    if (parseInt(a.rank) > parseInt(b.rank)) {
+                        return this.sortOrder;
+                    }
+
+                    return this.sortOrder * -1;
+                });
         },
     },
     methods: {
@@ -86,6 +131,9 @@ export default {
                     id: id,
                 },
             });
+        },
+        changeSortOrder: function () {
+            this.sortOrder = this.sortOrder * -1;
         },
     },
 };
